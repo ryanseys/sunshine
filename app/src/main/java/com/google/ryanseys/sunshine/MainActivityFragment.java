@@ -119,7 +119,6 @@ public class MainActivityFragment extends Fragment {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
