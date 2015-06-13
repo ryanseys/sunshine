@@ -4,8 +4,8 @@ import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,21 +68,67 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        String[] forecastArray = {
+            "Mon 6/23 - Sunny - 31/17",
+            "Tue 6/24 - Foggy - 21/8",
+            "Wed 6/25 - Cloudy - 22/17",
+            "Thurs 6/26 - Rainy - 18/11",
+            "Fri 6/27 - Foggy - 21/10",
+            "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
+            "Sun 6/29 - Sunny - 20/7"
+        };
+
+        final List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
+
+        // ArrayAdapter will take data from a source and use it to populate the ListView it's
+        // attached to.
+        mForecastAdapter = new ArrayAdapter<String>(
+            // The current context
+            getActivity(),
+            // The id of the list item layout
+            R.layout.list_item_forecast,
+            // The id of the textview to populate
+            R.id.list_item_forecast_textview,
+            // The forecast data
+            weekForecast
+        );
+
+
+        // Get a reference to the ListView and attach the adapter to it.
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(mForecastAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String forecast = weekForecast.get(position);
+                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return rootView;
+    }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         @Override
         protected void onPostExecute(String[] result) {
-            if(result != null) {
+            if (result != null) {
                 mForecastAdapter.clear();
                 for (String dayForecastStr : result) {
                     mForecastAdapter.add(dayForecastStr);
                 }
             }
         }
-
-        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         /* The date/time conversion code is going to be moved outside the asynctask later,
          * so for convenience we're breaking it out into its own method now.
@@ -269,52 +315,5 @@ public class MainActivityFragment extends Fragment {
 
             return null;
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        String[] forecastArray = {
-            "Mon 6/23 - Sunny - 31/17",
-            "Tue 6/24 - Foggy - 21/8",
-            "Wed 6/25 - Cloudy - 22/17",
-            "Thurs 6/26 - Rainy - 18/11",
-            "Fri 6/27 - Foggy - 21/10",
-            "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-            "Sun 6/29 - Sunny - 20/7"
-        };
-
-        final List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
-
-        // ArrayAdapter will take data from a source and use it to populate the ListView it's
-        // attached to.
-        mForecastAdapter = new ArrayAdapter<String>(
-            // The current context
-            getActivity(),
-            // The id of the list item layout
-            R.layout.list_item_forecast,
-            // The id of the textview to populate
-            R.id.list_item_forecast_textview,
-            // The forecast data
-            weekForecast
-        );
-
-
-        // Get a reference to the ListView and attach the adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = weekForecast.get(position);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return rootView;
     }
 }
