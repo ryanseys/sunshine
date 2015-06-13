@@ -1,9 +1,7 @@
 package com.google.ryanseys.sunshine;
 
-import android.annotation.TargetApi;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
@@ -147,8 +145,7 @@ public class MainActivityFragment extends Fragment {
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
+            return roundedHigh + "/" + roundedLow;
         }
 
         /**
