@@ -1,5 +1,6 @@
 package com.google.ryanseys.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,13 +73,13 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         String[] forecastArray = {
-            "Mon 6/23 - Sunny - 31/17",
-            "Tue 6/24 - Foggy - 21/8",
-            "Wed 6/25 - Cloudy - 22/17",
-            "Thurs 6/26 - Rainy - 18/11",
-            "Fri 6/27 - Foggy - 21/10",
-            "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-            "Sun 6/29 - Sunny - 20/7"
+                "Mon 6/23 - Sunny - 31/17",
+                "Tue 6/24 - Foggy - 21/8",
+                "Wed 6/25 - Cloudy - 22/17",
+                "Thurs 6/26 - Rainy - 18/11",
+                "Fri 6/27 - Foggy - 21/10",
+                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
+                "Sun 6/29 - Sunny - 20/7"
         };
 
         final List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
@@ -87,14 +87,14 @@ public class MainActivityFragment extends Fragment {
         // ArrayAdapter will take data from a source and use it to populate the ListView it's
         // attached to.
         mForecastAdapter = new ArrayAdapter<String>(
-            // The current context
-            getActivity(),
-            // The id of the list item layout
-            R.layout.list_item_forecast,
-            // The id of the textview to populate
-            R.id.list_item_forecast_textview,
-            // The forecast data
-            weekForecast
+                // The current context
+                getActivity(),
+                // The id of the list item layout
+                R.layout.list_item_forecast,
+                // The id of the textview to populate
+                R.id.list_item_forecast_textview,
+                // The forecast data
+                weekForecast
         );
 
 
@@ -105,8 +105,10 @@ public class MainActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = weekForecast.get(position);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+                String forecast = mForecastAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
             }
         });
 
@@ -156,7 +158,7 @@ public class MainActivityFragment extends Fragment {
          * into an Object hierarchy for us.
          */
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-            throws JSONException {
+                throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
             final String OWM_LIST = "list";
@@ -246,11 +248,11 @@ public class MainActivityFragment extends Fragment {
                 final String DAYS_PARAM = "cnt";
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, params[0])
-                    .appendQueryParameter(FORMAT_PARAM, format)
-                    .appendQueryParameter(UNITS_PARAM, units)
-                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
-                    .build();
+                        .appendQueryParameter(QUERY_PARAM, params[0])
+                        .appendQueryParameter(FORMAT_PARAM, format)
+                        .appendQueryParameter(UNITS_PARAM, units)
+                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                        .build();
 
                 URL url = new URL(builtUri.toString());
 
@@ -307,9 +309,8 @@ public class MainActivityFragment extends Fragment {
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
+                return null;
             }
-
-            return null;
         }
     }
 }
