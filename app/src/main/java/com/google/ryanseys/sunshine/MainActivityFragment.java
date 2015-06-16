@@ -72,17 +72,7 @@ public class MainActivityFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String[] forecastArray = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
-        };
-
-        final List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
+        final List<String> weekForecast = new ArrayList<String>();
 
         // ArrayAdapter will take data from a source and use it to populate the ListView it's
         // attached to.
@@ -111,6 +101,9 @@ public class MainActivityFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        weatherTask.execute("94043");
 
         return rootView;
     }
@@ -235,7 +228,7 @@ public class MainActivityFragment extends Fragment {
 
             String format = "json";
             String units = "metric";
-            int numDays = 7;
+            int numDays = 14;
 
             try {
                 // Construct the URL for the OpenWeatherMap query
