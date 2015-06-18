@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,19 +57,29 @@ public class MainActivityFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String zipCode = prefs.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default)
+        );
+
+        weatherTask.execute(zipCode);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String zipCode = prefs.getString(
-                    getString(R.string.pref_location_key),
-                    getString(R.string.pref_location_default)
-            );
-
-            weatherTask.execute(zipCode);
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -109,9 +120,6 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        FetchWeatherTask weatherTask = new FetchWeatherTask();
-        weatherTask.execute("94043");
-
         return rootView;
     }
 
@@ -143,11 +151,27 @@ public class MainActivityFragment extends Fragment {
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            String REAL_DEG = getString(R.string.pref_units_real);
+            String FREEDOM_DEG = getString(R.string.pref_units_freedom);
+
+            String deg = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_real));
+
+            if(deg.equals(REAL_DEG)) {
+                // Already in real degrees
+            } else if(deg.equals(FREEDOM_DEG)) {
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            } else {
+                Log.e("Sunshine", "Oops! Someone fucked up.");
+            }
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
-            return roundedHigh + "/" + roundedLow;
+            return roundedHigh + "°" + deg + " / " + roundedLow + "°" + deg;
         }
 
         /**
