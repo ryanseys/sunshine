@@ -1,9 +1,11 @@
 package com.google.ryanseys.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -29,7 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -60,7 +61,14 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("94043");
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String zipCode = prefs.getString(
+                    getString(R.string.pref_location_key),
+                    getString(R.string.pref_location_default)
+            );
+
+            weatherTask.execute(zipCode);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -86,7 +94,6 @@ public class MainActivityFragment extends Fragment {
                 // The forecast data
                 weekForecast
         );
-
 
         // Get a reference to the ListView and attach the adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
